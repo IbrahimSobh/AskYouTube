@@ -67,7 +67,7 @@ def generate_response(youtube_url, google_api_key, query_text):
     except:
       st.write("An error occurred")
 
-        return
+    return
 
 
 # Page title
