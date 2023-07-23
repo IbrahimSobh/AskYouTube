@@ -72,8 +72,8 @@ def generate_response(youtube_url, google_api_key, query_text):
 
 
 # Page title
-st.set_page_config(page_title='Ask YouTube via PaLM🌴 Model , LangChain 🦜🔗 and Chroma vector DB. By: Ibrahim Sobh')
-st.title('Ask YouTube via PaLM🌴 Model , LangChain 🦜🔗 and Chroma vector DB. By: Ibrahim Sobh')
+st.set_page_config(page_title='Ask YouTube 🎥 via PaLM🌴 Model , LangChain 🦜🔗 and Chroma vector DB. By: Ibrahim Sobh')
+st.title('Ask YouTube 🎥 via PaLM🌴 Model , LangChain 🦜🔗 and Chroma vector DB. By: Ibrahim Sobh')
 
 # File upload
 #uploaded_file = st.file_uploader('Upload text file', type='txt')
