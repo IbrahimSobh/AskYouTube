@@ -1,6 +1,6 @@
 streamlit
 langchain
-openai
+google-generativeai
 chromadb
 tiktoken
 yt_dlp
