@@ -5,3 +5,5 @@ chromadb
 tiktoken
 yt_dlp
 pydub
+ffprobe
+ffmpeg
