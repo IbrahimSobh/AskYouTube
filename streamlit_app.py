@@ -39,7 +39,8 @@ def generate_response(youtube_url, google_api_key, query_text):
     # Split them
     #text_splitter = RecursiveCharacterTextSplitter(chunk_size=1500, chunk_overlap=150)
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=512, chunk_overlap=32, separators=["\n\n", "\n", ",", " ", "."])
-    pages = text_splitter.split_text(text)
+    #pages = text_splitter.split_text(text)
+    pages = text_splitter.create_documents([text])
 
     st.write(len(pages))
     st.write(pages[0])
