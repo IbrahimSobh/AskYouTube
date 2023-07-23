@@ -7,3 +7,4 @@ yt_dlp
 pydub
 ffprobe
 ffmpeg
+youtube-transcript-api
