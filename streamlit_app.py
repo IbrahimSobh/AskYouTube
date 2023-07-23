@@ -4,9 +4,8 @@ from langchain.chains import RetrievalQA
 from langchain.llms import GooglePalm
 from langchain.embeddings import GooglePalmEmbeddings
 from langchain.prompts import PromptTemplate
-from langchain.document_loaders.generic import GenericLoader
-from langchain.document_loaders.parsers import OpenAIWhisperParser
-from langchain.document_loaders.blob_loaders.youtube_audio import YoutubeAudioLoader
+from langchain.document_loaders import YoutubeLoader
+
 
 # https://python.langchain.com/docs/modules/data_connection/document_loaders/integrations/youtube_audio
 
@@ -21,12 +20,13 @@ def generate_response(youtube_url, google_api_key, query_text):
     # Load document if file is uploaded
     # youtube_url
     # Two Karpathy lecture videos
-    urls = ["https://youtu.be/kCc8FmEb1nY", "https://youtu.be/VMj-3S1tku0"]
+    # urls = ["https://youtu.be/kCc8FmEb1nY", "https://youtu.be/VMj-3S1tku0"]
     #Directory to save audio files
     save_dir = "./youtube"
 
     # Transcribe the videos to text
-    loader = GenericLoader(YoutubeAudioLoader([youtube_url], save_dir), OpenAIWhisperParser())
+    # Use the YoutubeLoader to load and parse the transcript of a YouTube video
+    loader = YoutubeLoader.from_youtube_url(youtube_url, add_video_info=True)
     docs = loader.load()
     st.write(len(docs))
     st.write(docs[0].page_content[0:500])
