@@ -90,7 +90,8 @@ with st.form('myform', clear_on_submit=True):
                 result.append(response)
             del google_api_key
 
-st.write(response)
+if response: 
+    st.write(response)
 if len(result):
     st.markdown('**Answer:** **:blue[' + response['result'] + "]**")
     st.markdown('---')
