@@ -4,9 +4,11 @@ from langchain.chains import RetrievalQA
 from langchain.llms import GooglePalm
 from langchain.embeddings import GooglePalmEmbeddings
 from langchain.prompts import PromptTemplate
-from langchain.document_loaders import PyPDFLoader
-from tempfile import NamedTemporaryFile
+from langchain.document_loaders.generic import GenericLoader
+from langchain.document_loaders.parsers import OpenAIWhisperParser
+from langchain.document_loaders.blob_loaders.youtube_audio import YoutubeAudioLoader
 
+# https://python.langchain.com/docs/modules/data_connection/document_loaders/integrations/youtube_audio
 
 # Build prompt
 template = """Use the following pieces of context to answer the question at the end. If you don't know the answer, just say that you don't know, don't try to make up an answer. Use three sentences maximum. Keep the answer as concise as possible. Always say "thanks for asking!" at the end of the answer. 
@@ -18,45 +20,59 @@ QA_CHAIN_PROMPT = PromptTemplate.from_template(template)
 def generate_response(youtube_url, google_api_key, query_text):
     # Load document if file is uploaded
     # youtube_url
+    # Two Karpathy lecture videos
+    urls = ["https://youtu.be/kCc8FmEb1nY", "https://youtu.be/VMj-3S1tku0"]
+    #Directory to save audio files
+    save_dir = "./youtube"
+
+    # Transcribe the videos to text
+    loader = GenericLoader(YoutubeAudioLoader([youtube_url], save_dir), OpenAIWhisperParser())
+    docs = loader.load()
+    st.write(len(docs))
+    st.write(docs[0].page_content[0:500])
+
+    # Combine doc
+    combined_docs = [doc.page_content for doc in docs]
+    text = " ".join(combined_docs)
+
+    # Split them
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=1500, chunk_overlap=150)
+    pages = text_splitter.split_text(text)
+
+    st.write(len(pages))
+    st.write(pages[0].page_content[0:500])
+            
+    # Select embeddings
+    embeddings = GooglePalmEmbeddings(google_api_key=google_api_key)
     
-    if uploaded_file is not None:
-        with NamedTemporaryFile(dir='.', suffix='.pdf') as f:
-            f.write(uploaded_file.getbuffer())
-            loader = PyPDFLoader(f.name)
-            pages = loader.load_and_split()
-            st.write("Number of pages=  ", len(pages))
-            
-            # Select embeddings
-            embeddings = GooglePalmEmbeddings(google_api_key=google_api_key)
-            
-            # Create a vectorstore from documents
-            db = Chroma.from_documents(pages, embeddings) 
-            
-            # Create retriever interface
-            retriever = db.as_retriever(k=3)
-            # retriever = db.as_retriever(k=2, fetch_k=4)
-            # retriever = db.as_retriever(search_type="similarity_score_threshold", search_kwargs={"score_threshold": .9})
-            
-            # Create QA chain
-            #qa = RetrievalQA.from_chain_type(llm=GooglePalm(google_api_key=google_api_key, temperature=0.1, max_output_tokens=128), chain_type="stuff", retriever=retriever)
-            qa = RetrievalQA.from_chain_type(llm=GooglePalm(google_api_key=google_api_key, temperature=0.1, max_output_tokens=128),
-                                             chain_type="stuff",
-                                             retriever=retriever,
-                                             return_source_documents=True,
-                                             chain_type_kwargs={"prompt": QA_CHAIN_PROMPT})
+    # Create a vectorstore from documents
+    db = Chroma.from_documents(pages, embeddings) 
     
-            try:
-              res = qa({"query": query_text})
-              return res  
-            except:
-              st.write("An error occurred")
+    # Create retriever interface
+    retriever = db.as_retriever(k=3)
+    # retriever = db.as_retriever(k=2, fetch_k=4)
+    # retriever = db.as_retriever(search_type="similarity_score_threshold", search_kwargs={"score_threshold": .9})
+    
+    # Create QA chain
+    #qa = RetrievalQA.from_chain_type(llm=GooglePalm(google_api_key=google_api_key, temperature=0.1, max_output_tokens=128), chain_type="stuff", retriever=retriever)
+    qa = RetrievalQA.from_chain_type(llm=GooglePalm(google_api_key=google_api_key, temperature=0.1, max_output_tokens=128),
+                                     chain_type="stuff",
+                                     retriever=retriever,
+                                     return_source_documents=True,
+                                     chain_type_kwargs={"prompt": QA_CHAIN_PROMPT})
+
+    try:
+      res = qa({"query": query_text})
+      return res  
+    except:
+      st.write("An error occurred")
 
         return
 
 
 # Page title
-st.set_page_config(page_title='Ask your PDF via PaLM🌴 Model , LangChain 🦜🔗 and Chroma vector DB. By: Ibrahim Sobh')
-st.title('Ask your PDF via PaLM🌴 Model , LangChain 🦜🔗 and Chroma vector DB. By: Ibrahim Sobh')
+st.set_page_config(page_title='Ask YouTube via PaLM🌴 Model , LangChain 🦜🔗 and Chroma vector DB. By: Ibrahim Sobh')
+st.title('Ask YouTube via PaLM🌴 Model , LangChain 🦜🔗 and Chroma vector DB. By: Ibrahim Sobh')
 
 # File upload
 #uploaded_file = st.file_uploader('Upload text file', type='txt')
