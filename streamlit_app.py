@@ -15,8 +15,10 @@ Question: {question}
 Helpful Answer:"""
 QA_CHAIN_PROMPT = PromptTemplate.from_template(template)
 
-def generate_response(uploaded_file, google_api_key, query_text):
+def generate_response(youtube_url, google_api_key, query_text):
     # Load document if file is uploaded
+    # youtube_url
+    
     if uploaded_file is not None:
         with NamedTemporaryFile(dir='.', suffix='.pdf') as f:
             f.write(uploaded_file.getbuffer())
@@ -58,10 +60,11 @@ st.title('Ask your PDF via PaLM🌴 Model , LangChain 🦜🔗 and Chroma vector
 
 # File upload
 #uploaded_file = st.file_uploader('Upload text file', type='txt')
-uploaded_file = st.file_uploader('Upload pdf file', type='pdf')
+# uploaded_file = st.file_uploader('Upload pdf file', type='pdf')
+youtube_url = st.text_input('Enter YouTube url:', placeholder = 'https://youtu.be/kCc8FmEb1nY')
 
 # Query text
-query_text = st.text_input('Enter your question:', placeholder = 'Please provide a short summary.', disabled=not uploaded_file)
+query_text = st.text_input('Enter your question:', placeholder = 'Please provide a short summary.', disabled=not youtube_url)
 
 # Form input and query
 result = []
@@ -70,7 +73,7 @@ with st.form('myform', clear_on_submit=True):
     submitted = st.form_submit_button('Submit', disabled=not(uploaded_file and query_text))
     if submitted and google_api_key:
         with st.spinner('Calculating...'):
-            response = generate_response(uploaded_file, google_api_key, query_text)
+            response = generate_response(youtube_url, google_api_key, query_text)
             if response:
                 result.append(response)
             del google_api_key
