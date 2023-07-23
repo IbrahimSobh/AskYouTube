@@ -29,10 +29,18 @@ def generate_response(youtube_url, google_api_key, query_text):
         # Combine doc
         combined_docs = [doc.page_content for doc in docs]
         text = " ".join(combined_docs)
-    
+        
         # Split them
         text_splitter = RecursiveCharacterTextSplitter(chunk_size=512, chunk_overlap=32, separators=["\n\n", "\n", ",", " ", "."])
         pages = text_splitter.create_documents([text])
+
+        st.write(pages[0])
+        st.write(pages[1])
+        st.write(pages[2])
+        st.write(pages[-1])
+        st.write(pages[-2])
+        st.write(pages[-3])
+        
     
         # Select embeddings
         embeddings = GooglePalmEmbeddings(google_api_key=google_api_key)
