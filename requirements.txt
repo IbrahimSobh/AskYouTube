@@ -8,3 +8,4 @@ pydub
 ffprobe
 ffmpeg
 youtube-transcript-api
+pytube
