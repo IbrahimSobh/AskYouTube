@@ -18,33 +18,21 @@ Helpful Answer:"""
 QA_CHAIN_PROMPT = PromptTemplate.from_template(template)
 
 def generate_response(youtube_url, google_api_key, query_text):
-    # Load document if file is uploaded
-    # youtube_url
-    # Two Karpathy lecture videos
-    # urls = ["https://youtu.be/kCc8FmEb1nY", "https://youtu.be/VMj-3S1tku0"]
     #Directory to save audio files
     save_dir = "./youtube"
 
-    # Transcribe the videos to text
     # Use the YoutubeLoader to load and parse the transcript of a YouTube video
     loader = YoutubeLoader.from_youtube_url(youtube_url, add_video_info=True)
     docs = loader.load()
-    st.write(len(docs))
-    st.write(docs[0].page_content[0:500])
 
     # Combine doc
     combined_docs = [doc.page_content for doc in docs]
     text = " ".join(combined_docs)
 
     # Split them
-    #text_splitter = RecursiveCharacterTextSplitter(chunk_size=1500, chunk_overlap=150)
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=512, chunk_overlap=32, separators=["\n\n", "\n", ",", " ", "."])
-    #pages = text_splitter.split_text(text)
     pages = text_splitter.create_documents([text])
 
-    st.write(len(pages))
-    st.write(pages[0])
-            
     # Select embeddings
     embeddings = GooglePalmEmbeddings(google_api_key=google_api_key)
     
@@ -102,4 +90,4 @@ if len(result):
     st.markdown('---')
     st.markdown('**References:** ')
     for i, sd in enumerate(response['source_documents']):
-        st.markdown('**Page:** :green[' + str(sd.metadata["page"]) + "]")
+        st.markdown('**Ref ' + str(i) + '** :green[' + sd.page_content[:70] + "... ]")   
