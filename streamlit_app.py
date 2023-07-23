@@ -23,7 +23,7 @@ def generate_response(youtube_url, google_api_key, query_text):
 
     try:
         # Use the YoutubeLoader to load and parse the transcript of a YouTube video
-        loader = YoutubeLoader.from_youtube_url(youtube_url, add_video_info=True)
+        loader = YoutubeLoader.from_youtube_url(youtube_url, add_video_info=False)
         docs = loader.load()
     
         # Combine doc
@@ -90,6 +90,7 @@ with st.form('myform', clear_on_submit=True):
                 result.append(response)
             del google_api_key
 
+st.write(response)
 if len(result):
     st.markdown('**Answer:** **:blue[' + response['result'] + "]**")
     st.markdown('---')
