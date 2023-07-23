@@ -21,28 +21,33 @@ def generate_response(youtube_url, google_api_key, query_text):
     #Directory to save audio files
     save_dir = "./youtube"
 
-    # Use the YoutubeLoader to load and parse the transcript of a YouTube video
-    loader = YoutubeLoader.from_youtube_url(youtube_url, add_video_info=True)
-    docs = loader.load()
-
-    # Combine doc
-    combined_docs = [doc.page_content for doc in docs]
-    text = " ".join(combined_docs)
-
-    # Split them
-    text_splitter = RecursiveCharacterTextSplitter(chunk_size=512, chunk_overlap=32, separators=["\n\n", "\n", ",", " ", "."])
-    pages = text_splitter.create_documents([text])
-
-    # Select embeddings
-    embeddings = GooglePalmEmbeddings(google_api_key=google_api_key)
+    try:
+        # Use the YoutubeLoader to load and parse the transcript of a YouTube video
+        loader = YoutubeLoader.from_youtube_url(youtube_url, add_video_info=True)
+        docs = loader.load()
     
-    # Create a vectorstore from documents
-    db = Chroma.from_documents(pages, embeddings) 
+        # Combine doc
+        combined_docs = [doc.page_content for doc in docs]
+        text = " ".join(combined_docs)
     
-    # Create retriever interface
-    retriever = db.as_retriever(k=3)
-    # retriever = db.as_retriever(k=2, fetch_k=4)
-    # retriever = db.as_retriever(search_type="similarity_score_threshold", search_kwargs={"score_threshold": .9})
+        # Split them
+        text_splitter = RecursiveCharacterTextSplitter(chunk_size=512, chunk_overlap=32, separators=["\n\n", "\n", ",", " ", "."])
+        pages = text_splitter.create_documents([text])
+    
+        # Select embeddings
+        embeddings = GooglePalmEmbeddings(google_api_key=google_api_key)
+        
+        # Create a vectorstore from documents
+        db = Chroma.from_documents(pages, embeddings) 
+        
+        # Create retriever interface
+        retriever = db.as_retriever(k=3)
+        # retriever = db.as_retriever(k=2, fetch_k=4)
+        # retriever = db.as_retriever(search_type="similarity_score_threshold", search_kwargs={"score_threshold": .9})
+    
+    except:
+        st.write("An error occurred")
+        return   
     
     # Create QA chain
     #qa = RetrievalQA.from_chain_type(llm=GooglePalm(google_api_key=google_api_key, temperature=0.1, max_output_tokens=128), chain_type="stuff", retriever=retriever)
