@@ -41,9 +41,9 @@ def generate_response(youtube_url, google_api_key, query_text):
         db = Chroma.from_documents(pages, embeddings) 
         
         # Create retriever interface
-        # retriever = db.as_retriever(k=3)
+        retriever = db.as_retriever(k=3)
         # retriever = db.as_retriever(k=2, fetch_k=4)
-        retriever = db.as_retriever(search_type="similarity_score_threshold", search_kwargs={"score_threshold": .9})
+        # retriever = db.as_retriever(search_type="similarity_score_threshold", search_kwargs={"score_threshold": .9})
     
     except:
         st.write("An error occurred")
@@ -80,7 +80,6 @@ query_text = st.text_input('Enter your question:', placeholder = 'Please provide
 
 # Form input and query
 result = []
-response = None
 with st.form('myform', clear_on_submit=True):
     google_api_key = st.text_input('Google PaLM🌴 API Key', type='password', disabled=not (youtube_url and query_text))
     submitted = st.form_submit_button('Submit', disabled=not(youtube_url and query_text))
@@ -91,8 +90,7 @@ with st.form('myform', clear_on_submit=True):
                 result.append(response)
             del google_api_key
 
-if response: 
-    st.write(response)
+
 if len(result):
     st.markdown('**Answer:** **:blue[' + response['result'] + "]**")
     st.markdown('---')
