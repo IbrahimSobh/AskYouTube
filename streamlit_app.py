@@ -42,7 +42,7 @@ def generate_response(youtube_url, google_api_key, query_text):
     pages = text_splitter.split_text(text)
 
     st.write(len(pages))
-    st.write(pages[0].page_content[0:500])
+    st.write(pages[0])
             
     # Select embeddings
     embeddings = GooglePalmEmbeddings(google_api_key=google_api_key)
